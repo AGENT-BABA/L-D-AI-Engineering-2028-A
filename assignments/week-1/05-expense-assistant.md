@@ -87,4 +87,33 @@ Illustrative response:
 
 Combine deterministic business logic and multi-tool orchestration.
 
-[Back to assignment index](README.md)
+## Guided implementation (no solution code)
+
+### Step 1 — Set up the application
+Use express, dotenv, langchain, @langchain/google and zod. Copy the starter expenses and budget. Keep all amounts as numbers and use a consistent currency (INR). No web search is needed.
+
+### Step 2 — Design the business functions
+Before creating tools, decide the input and output for each calculation. Use JavaScript array methods such as filter and reduce to work with the data. Total spending, category totals, grouped breakdown and remaining balance should be deterministic: the same data must give the same numbers. Do not ask Gemini to calculate the reference totals.
+
+### Step 3 — Test the calculations in isolation
+Call each business function directly and compare against the reference table. Test unknown categories, empty data and a budget exceeded case. Decide whether unknown categories return zero with an explanation or a not-found result. Keep the behaviour consistent.
+
+### Step 4 — Design four tool definitions
+Wrap each function independently using tool(). For the category tool, describe the category string in a Zod object schema. For tools that need no arguments, use an empty object schema. Give each tool a distinct name and description explaining when it is useful. Return concise structured information for the model to interpret.
+
+### Step 5 — Register the tools
+Pass all four tools to createAgent. In the instructions, require verified expense data before financial claims and distinguish calculations from discretionary advice. A request combining spending and remaining budget may need multiple calls; avoid hardcoding prompt keywords to choose tools.
+
+### Step 6 — Build the API
+Validate the user prompt before agent.invoke. Check the final message for text and handle failures. Log actual tool names and inputs for demonstration. Do not expose raw agent history or credentials.
+
+### Step 7 — Test combined requests
+Verify the reference totals, highest category and remaining budget. For a proposed purchase, the budget tool supplies the balance; use deterministic JavaScript arithmetic for any exact additional calculation (you may extend a tool contract with an optional proposed amount if necessary). Test wording variations and unknown categories. Make sure suggestions follow the data.
+
+### Hints and checkpoints
+- Grouping expenses means accumulating amounts by category, not counting records.
+- Avoid mutating the starter array in required read-only tools.
+- For the optional add_expense tool, validate positive finite amounts and enforce explicit user authorization in application logic before writing; model instructions alone are not a permission check.
+- Ask yourself: are all reported totals traceable to actual tool results?
+
+[Back to Week 1 index](README.md)

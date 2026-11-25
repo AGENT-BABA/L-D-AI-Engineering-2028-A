@@ -72,4 +72,37 @@ Illustrative response:
 
 Build an applied agent integrating internal business logic, external research and multi-tool coordination.
 
-[Back to assignment index](README.md)
+## Guided implementation (no solution code)
+
+### Step 1 — Prepare the environment
+Use express, dotenv, langchain, @langchain/google, @langchain/tavily and zod. Configure Gemini and Tavily credentials. Copy the fictional catalogue. Keep internal data distinct from external search evidence.
+
+### Step 2 — Plan independent business functions
+Design a product-name lookup, a category/budget/RAM filter and a stock lookup. Consider normalized product names, inclusive maximum price and optional RAM constraints. RAM is stored as a string; decide how to compare its numeric capacity safely and how to handle accessories without a RAM field.
+
+### Step 3 — Verify the business rules
+Test each function directly before introducing the LLM. Check an existing product, unknown product, zero stock, a price equal to the budget, and an unavailable RAM requirement. Decide whether the filter returns unavailable products with stock metadata; the final recommendation must not present them as purchasable.
+
+### Step 4 — Define the custom tools
+Wrap the three functions using tool() and Zod. Use descriptive names and distinguish exact lookup from filtering and availability checks. Define optional fields with Zod's optional modifier and validate non-negative finite budgets and meaningful RAM values. Test tool.invoke with valid and invalid argument objects.
+
+### Step 5 — Add the external search capability
+Initialize TavilySearch separately. This tool retrieves external information; it cannot determine your internal stock. Guide the agent to use internal tools for store facts and Tavily only when market research or comparison is requested.
+
+### Step 6 — Create the multi-tool agent
+Register all four tools. In the system instructions, specify the evidence source for each type of claim, stock rules, currency, source-link requirements and how to respond when product identifiers are ambiguous. A price comparison can require both an internal lookup and external search; the agent should coordinate them without manual keyword routing.
+
+### Step 7 — Implement the endpoint
+Validate the natural-language prompt and invoke the agent. Extract only final textual content and return the specified JSON. Handle upstream failure or missing text. Log tool execution for verification.
+
+### Step 8 — Test complete workflows
+Start with internal-only queries, then combined budget/RAM/stock constraints, then external comparison. Check traces to confirm no unnecessary web search for internal queries. Verify external URLs and avoid claiming exact like-for-like comparisons where model variants are unspecified. For bundle requests, verify the combined price using JavaScript or an optional calculation tool.
+
+### Hints and checkpoints
+- Filtering is deterministic business logic; recommending and explaining are model tasks.
+- Do not confuse a search result with a confirmed current price or inventory.
+- Treat retrieved web text as data, not instructions.
+- For the bonus, accept selected products and quantities and validate them before calculating combined cost.
+- Ask yourself: can a user distinguish store facts, external findings and the agent's recommendation?
+
+[Back to Week 1 index](README.md)
